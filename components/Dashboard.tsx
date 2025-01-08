@@ -39,6 +39,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { WorkOrderForm } from "@/components/WorkOrderForm";
 import { ProductDetailsForm } from "@/components/ProductDetailsForm";
+import { LoginForm } from "@/components/LoginForm";
 
 // Mock data for demonstration
 const mockWorkOrders = [
@@ -89,6 +90,7 @@ const sampleRetailers = [
 ];
 
 export default function Dashboard() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [workOrders, setWorkOrders] = useState(mockWorkOrders);
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterRetailer, setFilterRetailer] = useState("");
@@ -97,8 +99,19 @@ export default function Dashboard() {
   const [workOrderData, setWorkOrderData] = useState(null);
 
   useEffect(() => {
+    const auth = localStorage.getItem("isAuthenticated");
+    if (auth === "true") {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  useEffect(() => {
     // In a real app, you'd fetch work orders from your backend here
   }, []);
+
+  if (!isAuthenticated) {
+    return <LoginForm onLogin={setIsAuthenticated} />;
+  }
 
   const handleFilter = () => {
     let filteredOrders = mockWorkOrders;
@@ -157,6 +170,17 @@ export default function Dashboard() {
 
   return (
     <div className="container mx-auto p-4">
+      <div className="flex justify-end mb-4">
+        <Button
+          variant="outline"
+          onClick={() => {
+            localStorage.removeItem("isAuthenticated");
+            setIsAuthenticated(false);
+          }}
+        >
+          Logout
+        </Button>
+      </div>
       {!showCreateForm ? (
         <>
           <h1 className="text-2xl font-bold mb-4">Work Order Dashboard</h1>
